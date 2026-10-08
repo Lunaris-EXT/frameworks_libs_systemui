@@ -27,7 +27,6 @@ import android.graphics.Shader
 import android.util.Log
 import android.util.SizeF
 import androidx.core.graphics.createBitmap
-import com.android.systemui.shared.Flags.panAndZoomInExtendedWallpaperEffects
 import com.android.wallpaper.weathereffects.graphics.FrameBuffer
 import com.android.wallpaper.weathereffects.graphics.WeatherEffect.Companion.DEFAULT_INTENSITY
 import com.android.wallpaper.weathereffects.graphics.WeatherEffectBase
@@ -54,7 +53,15 @@ class SnowEffect(
             initialSurfaceSize,
             SizeF(background.width.toFloat(), background.height.toFloat()),
         ),
-) : WeatherEffectBase(foreground, background, initialSurfaceSize, initialMatrix) {
+    isPanAndZoomInExtendedWallpaperEffectsEnabled: Boolean,
+) :
+    WeatherEffectBase(
+        foreground,
+        background,
+        initialSurfaceSize,
+        initialMatrix,
+        isPanAndZoomInExtendedWallpaperEffectsEnabled,
+    ) {
 
     private var snowSpeed: Float = 0.8f
     private val snowPaint = Paint().also { it.shader = snowConfig.colorGradingShader }
@@ -67,7 +74,7 @@ class SnowEffect(
     // accumulationFrameBuffer and accumulationFrameBufferPaint will get the result from
     // outlineFrameBuffer and add noise to snow fluffiness
     private var accumulationFrameBuffer =
-        if (panAndZoomInExtendedWallpaperEffects()) {
+        if (isPanAndZoomInExtendedWallpaperEffectsEnabled) {
             FrameBuffer(background.width, background.height)
         } else {
             FrameBuffer(
@@ -106,7 +113,7 @@ class SnowEffect(
 
     override fun adjustCropping() {
         super.adjustCropping()
-        if (panAndZoomInExtendedWallpaperEffects()) {
+        if (isPanAndZoomInExtendedWallpaperEffectsEnabled) {
             snowConfig.shader.setFloatUniform(
                 "transformMatrixAccumulation",
                 transformMatrixPosition,
@@ -173,7 +180,7 @@ class SnowEffect(
         get() = snowConfig.colorGradingIntensity
 
     override fun setCustomCropMatrix(matrix: Matrix) {
-        if (!panAndZoomInExtendedWallpaperEffects()) {
+        if (!isPanAndZoomInExtendedWallpaperEffectsEnabled) {
             Log.w(
                 TAG,
                 "setCustomCropMatrix should not be called when Flag panAndZoomInExtendedWallpaperEffects is disabled ",
@@ -193,7 +200,7 @@ class SnowEffect(
         val oldScale = bitmapScale
         super.setPositionMatrix(matrix)
         // Blur radius should change with scale because it decides the fluffiness of snow
-        if (!panAndZoomInExtendedWallpaperEffects()) {
+        if (!isPanAndZoomInExtendedWallpaperEffectsEnabled) {
             if (abs(bitmapScale - oldScale) > FLOAT_TOLERANCE) {
                 recreateFrameBuffers()
                 snowConfig.shader.setInputShader(
@@ -262,7 +269,7 @@ class SnowEffect(
         )
 
         // Keep boilerplate to avoid branches in shader codes
-        if (panAndZoomInExtendedWallpaperEffects()) {
+        if (isPanAndZoomInExtendedWallpaperEffectsEnabled) {
             snowConfig.accumulatedSnowResultShader.setFloatUniform(
                 "transformMatrixBitmapScaleOnly",
                 identityMatrixFloatArray,
@@ -284,7 +291,7 @@ class SnowEffect(
                     "accumulatedSnow",
                     BitmapShader(image, Shader.TileMode.CLAMP, Shader.TileMode.CLAMP),
                 )
-                if (!panAndZoomInExtendedWallpaperEffects()) {
+                if (!isPanAndZoomInExtendedWallpaperEffectsEnabled) {
                     outlineFrameBuffer.close()
                 }
             },
@@ -338,7 +345,7 @@ class SnowEffect(
         outlineFrameBuffer.close()
         accumulationFrameBuffer.close()
         outlineFrameBuffer = FrameBuffer(background.width, background.height)
-        if (panAndZoomInExtendedWallpaperEffects()) {
+        if (isPanAndZoomInExtendedWallpaperEffectsEnabled) {
             accumulationFrameBuffer = FrameBuffer(background.width, background.height)
         } else {
             accumulationFrameBuffer =

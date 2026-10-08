@@ -340,13 +340,14 @@ public class CustomDynamicColors {
                 .build();
     }
 
+
     public DynamicColor surfaceEffect0() {
         return new DynamicColor.Builder()
                 .setName("surface_effect_0")
                 .setPalette((s) -> s.primaryPalette)
                 .setTone((s) -> s.isDark ? 20.0 : 90.0)
                 .setIsBackground(true)
-                .setOpacity((s) -> 0.5)
+                .setOpacity((s)-> .5)
                 .build();
     }
 
@@ -356,7 +357,7 @@ public class CustomDynamicColors {
                 .setPalette((s) -> s.neutralPalette)
                 .setTone((s) -> s.isDark ? 6.0 : 98.0)
                 .setIsBackground(true)
-                .setOpacity((s) -> 0.54)
+                .setOpacity((s)-> .54)
                 .build();
     }
 
@@ -366,7 +367,7 @@ public class CustomDynamicColors {
                 .setPalette((s) -> s.primaryPalette)
                 .setTone((s) -> s.isDark ? 90.0 : 100.0)
                 .setIsBackground(true)
-                .setOpacity((s) -> s.isDark ? 0.15 : 0.32)
+                .setOpacity((s)-> s.isDark ? .15 : .32)
                 .build();
     }
 
@@ -376,7 +377,7 @@ public class CustomDynamicColors {
                 .setPalette((s) -> s.primaryPalette)
                 .setTone((s) -> s.isDark ? 90.0 : 40.0)
                 .setIsBackground(true)
-                .setOpacity((s) -> s.isDark ? 0.1 : 0.15)
+                .setOpacity((s)-> s.isDark ? .10 : .15)
                 .build();
     }
 
@@ -431,4 +432,5 @@ public class CustomDynamicColors {
         double answer = findBestToneForChroma(palette.getHue(), palette.getChroma(), 0, false);
         return MathUtils.clampDouble(lowerBound, upperBound, answer);
     }
+
 }

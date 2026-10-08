@@ -46,9 +46,6 @@ import androidx.core.os.BuildCompat;
 import com.android.launcher3.icons.cache.CachingLogic;
 import com.android.launcher3.util.ComponentKey;
 
-import com.android.launcher3.util.override.MainThreadInitializedObject;
-import com.android.launcher3.util.override.ResourceBasedOverride;
-
 import java.util.Calendar;
 import java.util.Objects;
 
@@ -63,14 +60,12 @@ public class IconProvider implements ResourceBasedOverride {
 
     private static final String ICON_METADATA_KEY_PREFIX = ".dynamic_icons";
 
-    private static final String SYSTEM_STATE_SEPARATOR = " ";
-
     protected final Context mContext;
     private final ComponentName mCalendar;
     private final ComponentName mClock;
 
     @NonNull
-    protected String mSystemState = "";
+    protected PersistedItemState mSystemState = new PersistedItemState();
 
     public static MainThreadInitializedObject<IconProvider> INSTANCE =
             forOverride(IconProvider.class, R.string.icon_provider_class);
@@ -88,25 +83,24 @@ public class IconProvider implements ResourceBasedOverride {
      *
      * @see #updateSystemState()
      */
-    public String getStateForApp(@Nullable ApplicationInfo appInfo) {
+    public PersistedItemState getStateForApp(@Nullable ApplicationInfo appInfo) {
         if (appInfo == null) {
             return mSystemState;
         }
 
         if (mCalendar != null && mCalendar.getPackageName().equals(appInfo.packageName)) {
-            return mSystemState + SYSTEM_STATE_SEPARATOR + getDay() + SYSTEM_STATE_SEPARATOR
-                    + getApplicationInfoHash(appInfo);
+            return getApplicationInfoHash(appInfo).withAdditionalValues(Integer.toString(getDay()));
         } else {
-            return mSystemState + SYSTEM_STATE_SEPARATOR + getApplicationInfoHash(appInfo);
+            return getApplicationInfoHash(appInfo);
         }
     }
 
     /**
      * Returns a hash to uniquely identify a particular version of appInfo
      */
-    protected String getApplicationInfoHash(@NonNull ApplicationInfo appInfo) {
+    protected PersistedItemState getApplicationInfoHash(@NonNull ApplicationInfo appInfo) {
         // The hashString in source dir changes with every install
-        return appInfo.sourceDir;
+        return mSystemState.withAdditionalValues(appInfo.sourceDir);
     }
 
     /**
@@ -275,8 +269,9 @@ public class IconProvider implements ResourceBasedOverride {
      * and system-version.
      */
     public void updateSystemState() {
-        mSystemState = mContext.getResources().getConfiguration().getLocales().toLanguageTags()
-                + "," + Build.VERSION.INCREMENTAL + ThemedIconSettings.getState(mContext);
+        mSystemState = mSystemState.withLocaleAndSdk(
+                mContext.getResources().getConfiguration().getLocales().toLanguageTags(),
+                Build.VERSION.SDK_INT);
     }
 
     /**
