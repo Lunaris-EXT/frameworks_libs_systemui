@@ -27,6 +27,7 @@ import android.graphics.BlendModeColorFilter
 import android.graphics.Canvas
 import android.graphics.ColorFilter
 import android.graphics.Paint
+import android.graphics.Path
 import android.graphics.PixelFormat.TRANSLUCENT
 import android.graphics.drawable.AdaptiveIconDrawable
 import android.graphics.drawable.AdaptiveIconDrawable.getExtraInsetFraction
@@ -44,6 +45,7 @@ import com.android.launcher3.icons.IconThemeController
 import com.android.launcher3.icons.MonochromeIconFactory
 import com.android.launcher3.icons.SourceHint
 import com.android.launcher3.icons.ThemedBitmap
+import com.android.launcher3.icons.ThemedIconSettings
 import java.nio.ByteBuffer
 
 @TargetApi(Build.VERSION_CODES.TIRAMISU)

@@ -45,6 +45,8 @@ import androidx.core.os.BuildCompat;
 
 import com.android.launcher3.icons.cache.CachingLogic;
 import com.android.launcher3.util.ComponentKey;
+import com.android.launcher3.util.override.MainThreadInitializedObject;
+import com.android.launcher3.util.override.ResourceBasedOverride;
 
 import java.util.Calendar;
 import java.util.Objects;
@@ -271,7 +273,8 @@ public class IconProvider implements ResourceBasedOverride {
     public void updateSystemState() {
         mSystemState = mSystemState.withLocaleAndSdk(
                 mContext.getResources().getConfiguration().getLocales().toLanguageTags(),
-                Build.VERSION.SDK_INT);
+                Build.VERSION.SDK_INT)
+                .withAdditionalValues(ThemedIconSettings.getState(mContext));
     }
 
     /**
